@@ -1,4 +1,4 @@
-.PHONY: build jupyter shell run run-all figures-clean help
+.PHONY: build jupyter shell run run-all run-concept concepts-all figures-clean help
 
 CHAPTERS := \
 	ch06_linear_regression \
@@ -51,6 +51,20 @@ run-all:
 	@for ch in $(CHAPTERS); do \
 		echo "\n=== $$ch ==="; \
 		docker compose run --rm app python $$ch/main.py; \
+	done
+
+## Run the how_it_works.py for one chapter  (usage: make run-concept CHAPTER=ch06_linear_regression)
+run-concept:
+	@test -n "$(CHAPTER)" || (echo "Usage: make run-concept CHAPTER=ch06_linear_regression" && exit 1)
+	docker compose run --rm app python $(CHAPTER)/how_it_works.py
+
+## Run how_it_works.py for all chapters that have one
+concepts-all:
+	@for ch in $(CHAPTERS); do \
+		if [ -f $$ch/how_it_works.py ]; then \
+			echo "\n=== $$ch (concepts) ==="; \
+			docker compose run --rm app python $$ch/how_it_works.py; \
+		fi \
 	done
 
 ## Delete all generated figure files (keeps directory structure)
